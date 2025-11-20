@@ -1,0 +1,74 @@
+# ===========================================
+# GitHub Actions Workflow: Terraform Terrascan Analysis
+# Environment: CI
+# Description:
+#   - Analyzes Terraform infrastructure for security and compliance using Terrascan
+#   - Runs on every push or pull request to 'main'
+#   - Does NOT deploy infrastructure, only generates plan and scans it
+# ===========================================
+
+name: Terraform Terrascan Analysis
+
+# -------------------------------------------
+# Trigger: Run workflow on push or PR to 'main' branch
+# -------------------------------------------
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# -------------------------------------------
+# Jobs Definition
+# -------------------------------------------
+jobs:
+  # =========================================
+  # Job: Terrascan Analysis
+  # Purpose: Generate Terraform plan and scan with Terrascan
+  # =========================================
+  terrascan:
+    name: Terraform Plan & Terrascan
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Step 2: Set up Terraform CLI
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.14.0
+
+      # Step 3: Install Terrascan
+      - name: Install Terrascan
+        run: |
+          curl -L https://github.com/accurics/terrascan/releases/latest/download/terrascan_$(uname -s)_$(uname -m).tar.gz | tar xz
+          sudo mv terrascan /usr/local/bin/
+
+      # Step 4: Initialize Terraform and validate
+      - name: Terraform Init & Validate
+        run: |
+          terraform init -input=false
+          terraform validate
+
+      # Step 5: Generate Terraform plan
+      - name: Terraform Plan
+        run: |
+          terraform plan -out=tfplan.out
+          terraform show -no-color tfplan.out > tfplan.txt
+
+      # Step 6: Run Terrascan on the Terraform plan
+      - name: Run Terrascan Scan
+        run: |
+          terrascan scan -t terraform -f tfplan.txt
+
+      # Step 7: Output summary
+      - name: Output Terrascan summary
+        run: |
+          echo "Terrascan scan complete. Check the logs above for security and compliance findings."

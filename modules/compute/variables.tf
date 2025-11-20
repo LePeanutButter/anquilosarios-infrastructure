@@ -1,0 +1,7 @@
+variable "vm_count" {}
+variable "vm_size" {}
+variable "admin_username" {}
+variable "admin_public_key" {}
+variable "resource_group_name" {}
+variable "location" {}
+variable "acr_name" {}
