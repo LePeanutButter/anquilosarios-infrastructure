@@ -140,7 +140,7 @@ jobs:
           
       # Step 3: Initializes Terraform, downloads modules and providers.
       - name: Terraform Init
-        run: terraform init -input=false
+        run: terraform init -input=false -upgrade
 
       # Step 4: Checks Terraform files for syntax errors and internal consistency.
       - name: Run Terraform validate
@@ -172,7 +172,7 @@ jobs:
           
       # Step 3: Initializes Terraform environment and modules.
       - name: Terraform Init
-        run: terraform init -input=false
+        run: terraform init -input=false -upgrade
 
       # Step 4: Generates a plan file (`tfplan.out`) containing planned changes.
       - name: Run Terraform plan and save
