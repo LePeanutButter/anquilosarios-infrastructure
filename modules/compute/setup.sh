@@ -73,7 +73,7 @@ fi
 cd "${APP_DIR}"
 # Prefer new 'docker compose' plugin; fallback to docker-compose if necessary
 if docker compose version >/dev/null 2>&1; then
-    docker compose up -d || true
+    docker compose up -d --pull always || true
 else
-    docker-compose up -d || true
+    docker-compose up -d --pull always || true
 fi

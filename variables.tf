@@ -50,5 +50,5 @@ variable "backend_port" {
 # Name of the Azure Container Registry to be created.
 variable "acr_name" {
     type    = string
-    default = "anquiloacr001"
+    default = "anquilosuarios-acr"
 }

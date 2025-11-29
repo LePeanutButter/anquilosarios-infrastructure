@@ -1,0 +1,248 @@
+# ===========================================
+# GitHub Actions Workflow: Terraform Infrastructure Pipeline
+# Environment: CI/CD for IaC (Infrastructure as Code)
+# Description:
+#   - CI: Performs Terrascan security scan, formats, validates, and plans Terraform infrastructure
+#   - CD: Waits for manual approval, then executes 'terraform apply' to deploy
+#   - Workflow triggers on push to the 'main' branch
+# ===========================================
+
+name: Terraform IaC Pipeline
+
+# -------------------------------------------
+# Trigger: Run workflow on push or PR to 'main' branch
+# -------------------------------------------
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# -------------------------------------------
+# Global Environment Variables
+# -------------------------------------------
+env:
+  TF_PLAN_FILE: tfplan.out
+  TF_VERSION: 1.14.0
+
+# -------------------------------------------
+# Jobs Definition
+# -------------------------------------------
+jobs:
+  # =========================================
+  # Job: Checkout Source Code
+  # Purpose: Prepare repository and artifacts for CI/CD jobs
+  # =========================================
+  checkout_code:
+    name: Checkout Source Code
+    runs-on: ubuntu-latest
+    steps:
+
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      # Step 2: Setup Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          
+      # Step 3: Upload source code artifact for downstream jobs
+      - name: Archive Code for Next Jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-code
+          path: .
+          retention-days: 1
+
+  # =========================================
+  # Job: Terrascan Security Scan
+  # Purpose: Detect security and compliance issues in Terraform code
+  # =========================================
+  terrascan:
+    name: Terrascan Security Scan
+    runs-on: ubuntu-latest
+    needs: [checkout_code]
+    steps:
+      # Step 1: Download source code artifact
+      - name: Retrieve Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Setup Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          
+      # Step 3: Install Terrascan tool
+      - name: Install Terrascan
+        run: |
+          curl -L https://github.com/accurics/terrascan/releases/latest/download/terrascan_$(uname -s)_$(uname -m).tar.gz | tar xz
+          sudo mv terrascan /usr/local/bin/
+
+      # Step 4: Run Terrascan scan
+      - name: Run Terrascan Scan
+        run: terrascan scan -t terraform -i -d . || true 
+
+  # =========================================
+  # Job: Terraform Format Check
+  # Purpose: Ensure Terraform code formatting is correct
+  # =========================================
+  terraform_fmt:
+    name: Terraform Format Check
+    runs-on: ubuntu-latest
+    needs: [terrascan]
+    steps:
+      # Step 1: Downloads the source code artifact.
+      - name: Retrieve Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Installs Terraform CLI to use formatting commands.
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          
+      # Step 3: Checks if Terraform code is properly formatted; fails if formatting issues exist.
+      - name: Run Terraform fmt check
+        id: fmt
+        run: terraform fmt -check 
+
+  # =========================================
+  # Job: Terraform Validation
+  # Purpose: Validate Terraform configuration for syntax and logical correctness
+  # =========================================
+  terraform_validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    needs: [terraform_fmt]
+    steps:
+      # Step 1: Downloads the source code artifact.
+      - name: Retrieve Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Installs Terraform CLI for validation commands.
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          
+      # Step 3: Initializes Terraform, downloads modules and providers.
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      # Step 4: Checks Terraform files for syntax errors and internal consistency.
+      - name: Run Terraform validate
+        run: terraform validate -no-color
+
+  # =========================================
+  # Job: Terraform Plan
+  # Purpose: Generate an execution plan for infrastructure changes
+  # =========================================
+  terraform_plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: [terraform_validate]
+    outputs:
+      plan_id: ${{ steps.plan.outputs.id }}
+    steps:
+      # Step 1: Downloads the source code artifact.
+      - name: Retrieve Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Installs Terraform CLI for validation commands.
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          
+      # Step 3: Initializes Terraform environment and modules.
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      # Step 4: Generates a plan file (`tfplan.out`) containing planned changes.
+      - name: Run Terraform plan and save
+        id: plan
+        run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
+      
+      # Step 5: Saves the plan artifact for manual approval and apply.
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.TF_PLAN_FILE }}
+          path: ${{ env.TF_PLAN_FILE }}
+          retention-days: 1
+
+  # =========================================
+  # Job: Manual Approval Gate
+  # Purpose: Pause workflow for human approval before deployment
+  # =========================================
+  manual_approval:
+    name: Manual Approval Gate
+    runs-on: ubuntu-latest
+    needs: [terraform_plan]
+    environment:
+      name: production
+    steps:
+      # Step 1: Pauses workflow until someone with access approves the deployment in GitHub environment.
+      - name: Wait for Manual Approval
+        run: echo "Waiting for manual approval to proceed with deployment."
+
+  # =========================================
+  # Job: Deploy Infrastructure
+  # Purpose: Deploy infrastructure using the previously approved plan
+  # =========================================
+  terraform_apply:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: [manual_approval]
+    if: github.event_name == 'push'
+    steps:
+      # Step 1: Downloads the source code artifact.
+      - name: Retrieve Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Installs Terraform CLI for validation commands.
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      # Step 3: Authenticates with Azure using service principal stored in secrets.
+      - name: Configure Azure Credentials
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }} 
+      
+      # Step 4: Downloads the approved Terraform plan artifact (`tfplan.out`).
+      - name: Download Verified Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TF_PLAN_FILE }}
+          path: .
+
+      # Step 5: Initializes Terraform environment before applying.
+      - name: Terraform Init
+        run: terraform init -input=false
+      
+      # Step 6: Applies the infrastructure changes from the plan with auto-approval.
+      - name: Execute Terraform Apply
+        run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
