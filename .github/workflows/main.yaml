@@ -80,23 +80,14 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
           
-      # Step 3: Install Terrascan tool
-      - name: Install Terrascan
+      # Step 3: Configure Docker Execution for Terrascan
+      - name: Run Terrascan Init and Scan
         run: |
-          # Download and extract the latest release
-          curl -L "https://github.com/accurics/terrascan/releases/latest/download/terrascan_$(uname -s)_$(uname -m).tar.gz" -o terrascan.tar.gz
-          tar -xzf terrascan.tar.gz
+          echo "Initializing Terrascan policies..."
+          docker run --rm -v "${PWD}:${PWD}" -w "${PWD}" accurics/terrascan init
           
-          sudo mv terrascan /usr/local/bin/
-          rm terrascan.tar.gz
-      
-      # Step 4: Initialize Terrascan Policies
-      - name: Initialize Terrascan Policies
-        run: terrascan init
-
-      # Step 5: Run Terrascan scan
-      - name: Run Terrascan Scan
-        run: terrascan scan -t terraform -i -d . || true
+          echo "Starting Terrascan scan..."
+          docker run --rm -v "${PWD}:${PWD}" -w "${PWD}" accurics/terrascan scan -t terraform -i -d . || true
 
   # =========================================
   # Job: Terraform Format Check
