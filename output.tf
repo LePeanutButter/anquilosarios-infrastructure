@@ -104,6 +104,6 @@ output "admin_username" {
     variable stores.
 */
 output "admin_password" {
-  value = azurerm_container_registry.acr.admin_password
+  value     = azurerm_container_registry.acr.admin_password
   sensitive = true
 }

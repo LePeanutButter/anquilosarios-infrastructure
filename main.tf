@@ -6,22 +6,22 @@
     incompatible Terraform or provider versions from being used.
 */
 terraform {
-    required_providers {
-        /*
+  required_providers {
+    /*
             AzureRM Provider
             ----------------
             - source: Specifies the official HashiCorp AzureRM provider.
             - version: Uses a version constraint (~> 3.0) to allow newer
             compatible minor versions while preventing breaking changes.
         */
-        azurerm = {
-            source  = "hashicorp/azurerm"
-            version = "~> 3.0"
-        }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
     }
+  }
 
-    # Require Terraform CLI version 1.14.0 or newer.
-    required_version = ">= 1.14.0"
+  # Require Terraform CLI version 1.14.0 or newer.
+  required_version = ">= 1.14.0"
 }
 
 /*
@@ -31,7 +31,7 @@ terraform {
     provider-specific features and ensures compatibility with the AzureRM provider.
 */
 provider "azurerm" {
-    features {}
+  features {}
 }
 
 /*
@@ -52,10 +52,10 @@ provider "azurerm" {
     - Purpose: Creates a dedicated Azure Resource Group for organizing resources.
 */
 module "resource_group" {
-    source = "./modules/resource_group"
+  source = "./modules/resource_group"
 
-    resource_group_name = var.resource_group_name
-    location            = var.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
 }
 
 /*
@@ -69,10 +69,10 @@ module "resource_group" {
         required for the virtual machines and other resources.
 */
 module "network" {
-    source = "./modules/network"
+  source = "./modules/network"
 
-    resource_group_name = var.resource_group_name
-    location            = var.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
 }
 
 /*
@@ -89,15 +89,15 @@ module "network" {
     - Purpose: Provisions Linux virtual machines with the specified configuration.
 */
 module "compute" {
-    source = "./modules/compute"
+  source = "./modules/compute"
 
-    vm_count            = var.vm_count
-    vm_size             = var.vm_size
-    admin_username      = var.admin_username
-    admin_public_key    = var.admin_public_key
-    resource_group_name = var.resource_group_name
-    location            = var.location
-    acr_name            = var.acr_name
+  vm_count            = var.vm_count
+  vm_size             = var.vm_size
+  admin_username      = var.admin_username
+  admin_public_key    = var.admin_public_key
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  acr_name            = var.acr_name
 }
 
 /*
@@ -115,15 +115,15 @@ module "compute" {
         with the backend pool.
 */
 module "loadbalancer" {
-    source = "./modules/loadbalancer"
+  source = "./modules/loadbalancer"
 
-    resource_group_name = var.resource_group_name
-    location            = var.location
-    frontend_port       = var.frontend_port
-    backend_port        = var.backend_port
-    vm_count            = var.vm_count
-    nic_ids             = module.compute.nic_ids
-    nic_ip_names        = module.compute.nic_ip_names
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  frontend_port       = var.frontend_port
+  backend_port        = var.backend_port
+  vm_count            = var.vm_count
+  nic_ids             = module.compute.nic_ids
+  nic_ip_names        = module.compute.nic_ip_names
 }
 
 /*
@@ -145,8 +145,8 @@ module "loadbalancer" {
             container delivery across environments.
 */
 module "acr" {
-    source              = "./modules/acr"
-    acr_name            = var.acr_name
-    resource_group_name = module.resource_group.name
-    location            = module.resource_group.location
+  source              = "./modules/acr"
+  acr_name            = var.acr_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
 }

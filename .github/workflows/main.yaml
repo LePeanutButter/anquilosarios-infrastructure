@@ -83,11 +83,15 @@ jobs:
       # Step 3: Configure Docker Execution for Terrascan
       - name: Run Terrascan Init and Scan
         run: |
-          echo "Initializing Terrascan policies..."
           docker run --rm -v "${PWD}:${PWD}" -w "${PWD}" accurics/terrascan init
           
           echo "Starting Terrascan scan..."
-          docker run --rm -v "${PWD}:${PWD}" -w "${PWD}" accurics/terrascan scan -t terraform -i -d . || true
+          docker run --rm \
+            -v "${PWD}":"${PWD}" \
+            -w "${PWD}" \
+            accurics/terrascan scan \
+            -t terraform \
+            -d . || true
 
   # =========================================
   # Job: Terraform Format Check
