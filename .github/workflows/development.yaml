@@ -81,14 +81,12 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           
       # Step 3: Install Terrascan tool
-      - name: Install Terrascan
-        run: |
-          curl -L https://github.com/accurics/terrascan/releases/latest/download/terrascan_$(uname -s)_$(uname -m).tar.gz | tar xz
-          sudo mv terrascan /usr/local/bin/
+      - name: Setup Terrascan
+        uses: accurics/terrascan-action@v1
 
       # Step 4: Run Terrascan scan
       - name: Run Terrascan Scan
-        run: terrascan scan -t terraform -i -d . || true 
+        run: terrascan scan -t terraform -i -d . || true
 
   # =========================================
   # Job: Terraform Format Check
