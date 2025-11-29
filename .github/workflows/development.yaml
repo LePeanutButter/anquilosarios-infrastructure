@@ -81,10 +81,20 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           
       # Step 3: Install Terrascan tool
-      - name: Setup Terrascan
-        uses: accurics/terrascan-action@v1
+      - name: Install Terrascan
+        run: |
+          # Download and extract the latest release
+          curl -L "https://github.com/accurics/terrascan/releases/latest/download/terrascan_$(uname -s)_$(uname -m).tar.gz" -o terrascan.tar.gz
+          tar -xzf terrascan.tar.gz
+          
+          sudo mv terrascan /usr/local/bin/
+          rm terrascan.tar.gz
+      
+      # Step 4: Initialize Terrascan Policies
+      - name: Initialize Terrascan Policies
+        run: terrascan init
 
-      # Step 4: Run Terrascan scan
+      # Step 5: Run Terrascan scan
       - name: Run Terrascan Scan
         run: terrascan scan -t terraform -i -d . || true
 
