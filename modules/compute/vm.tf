@@ -20,8 +20,8 @@ locals {
 resource "azurerm_linux_virtual_machine" "vm" {
     count               = var.vm_count
     name                = "anquilo-vm-${count.index}"
-    resource_group_name = azurerm_resource_group.rg.name
-    location            = azurerm_resource_group.rg.location
+    resource_group_name = var.resource_group_name
+    location            = var.location
     size                = var.vm_size
     admin_username      = var.admin_username
 
