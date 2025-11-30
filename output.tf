@@ -43,7 +43,7 @@ output "admin_username" {
 
 # Admin password for Azure Container Registry
 output "admin_password" {
-  value = module.acr.admin_password
+  value     = module.acr.admin_password
   sensitive = true
 }
 
