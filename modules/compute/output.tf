@@ -37,6 +37,17 @@ output "nic_ids" {
     value = azurerm_network_interface.nic[*].id
 }
 
+/*
+    NIC IP Configuration Names Output
+    ---------------------------------
+    - description: Returns the names of the primary IP configurations associated
+      with each `azurerm_network_interface.nic` resource.
+    - value: Extracts the `name` attribute from the first `ip_configuration`
+      block of each NIC.
+    - usage: Useful for referencing NIC IP configurations in load balancers,
+      network rules, diagnostics, or when performing automated updates
+      or validations on NIC-level network settings.
+*/
 output "nic_ip_names" {
     value = [for nic in azurerm_network_interface.nic : nic.ip_configuration[0].name]
 }

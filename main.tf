@@ -141,8 +141,7 @@ module "loadbalancer" {
   Purpose:
       - Deploys an Azure Container Registry for storing and managing Docker
           container images used by applications or CI/CD pipelines.
-      - Supports seamless integration with Azure Kubernetes Service (AKS),
-          Azure Container Instances (ACI), and VM-based deployments.
+      - Supports seamless integration with Azure Container Instances (ACI), and VM-based deployments.
       - Provides secure and centralized image storage, enabling consistent
           container delivery across environments.
 */
@@ -151,4 +150,31 @@ module "acr" {
   acr_name            = var.acr_name
   resource_group_name = module.resource_group.rg_name
   location            = module.resource_group.rg_location
+}
+
+/*
+  Automation Module
+  -----------------
+  - source: Path to the local automation module.
+  
+  Inputs:
+      - resource_group_name: The Azure Resource Group where automation
+          resources will be created.
+      - location: Azure region for the automation account deployment.
+
+  Purpose:
+      - Deploys an Azure Automation Account configured to manage VM
+          operations, specifically automated VM reboots.
+      - Sets up runbooks, schedules, or scripts to perform periodic or
+          on-demand reboots of virtual machines provisioned via the
+          compute module.
+      - Ensures VMs are maintained in a desired operational state
+          without manual intervention, improving reliability and
+          uptime.
+*/
+module "automation" {
+  source              = "./modules/automation"
+  resource_group_name = module.resource_group.rg_name
+  location            = module.resource_group.rg_location
+  lb_id               = module.loadbalancer.lb_id
 }
