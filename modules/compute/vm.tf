@@ -1,22 +1,15 @@
 # -------------------------------------------
-# Template Rendering: Docker Compose
+# Template Rendering: Docker Compose YAML
 # -------------------------------------------
-data "templatefile" "docker_compose" {
-    template = "${path.module}/docker-compose.tpl"
-    vars = {
-        acr_name = var.acr_name
-    }
-}
+locals {
+  docker_compose = templatefile("${path.module}/docker-compose.tpl", {
+    acr_name = var.acr_name
+  })
 
-# -------------------------------------------
-# Template Rendering: Cloud-Init
-# -------------------------------------------
-data "templatefile" "cloud_init" {
-    template = "${path.module}/cloud-init.tpl"
-    vars = {
-        compose_yaml = indent(6, data.templatefile.docker_compose.rendered)
-        setup_script = indent(6, file("${path.module}/setup.sh"))
-    }
+  cloud_init = templatefile("${path.module}/cloud-init.tpl", {
+    compose_yaml = indent(6, local.docker_compose)
+    setup_script = indent(6, file("${path.module}/setup.sh"))
+  })
 }
 
 /*
@@ -27,8 +20,8 @@ data "templatefile" "cloud_init" {
 resource "azurerm_linux_virtual_machine" "vm" {
     count               = var.vm_count
     name                = "anquilo-vm-${count.index}"
-    resource_group_name = azurerm_resource_group.rg.name
-    location            = azurerm_resource_group.rg.location
+    resource_group_name = var.resource_group_name
+    location            = var.location
     size                = var.vm_size
     admin_username      = var.admin_username
 
@@ -63,7 +56,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
 
     # read the plain shell script and base64-encode it for Azure custom_data
-    custom_data = base64encode(data.templatefile.cloud_init.rendered)
+    custom_data = base64encode(local.cloud_init)
 
 
     # Metadata tags for lifecycle management

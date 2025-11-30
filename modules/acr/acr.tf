@@ -18,7 +18,7 @@
           disabled in production environments for stronger security.
 
     Usage:
-        - Supports storing Docker images for AKS, Azure Container Instances,
+        - Supports storing Docker images for Azure Container Instances,
           App Services, and VM-based deployments.
         - Integrates with build pipelines to push and pull container images.
 */
