@@ -30,9 +30,8 @@ variable "admin_username" {
 
 # SSH public key for admin access. Must be in standard "ssh-rsa AAAA..." format.
 variable "admin_public_key" {
+  description = "SSH public key for VM login"
   type        = string
-  description = "Your SSH public key (ssh-rsa AAAA...)"
-  default     = ""
 }
 
 # Port on which the load balancer will listen for incoming traffic.
@@ -50,5 +49,5 @@ variable "backend_port" {
 # Name of the Azure Container Registry to be created.
 variable "acr_name" {
   type    = string
-  default = "anquilosuarios-acr"
+  default = "anquiloacr"
 }
