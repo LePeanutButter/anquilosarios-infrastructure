@@ -1,10 +1,13 @@
 # ===========================================
 # Cloud-Init Configuration Template: cloud-config.tpl
-# Environment: Cloud VM / Instance Initialization
+#
+# Environment:
+# - Used for initializing a cloud VM/instance at first boot
+#
 # Description:
-#   - Creates and writes files required for Docker deployment
-#   - Sets permissions and ownership for configuration and setup scripts
-#   - Executes setup script on first boot to deploy services
+# - Writes required configuration files for Docker Swarm deployment
+# - Ensures proper file permissions and ownership
+# - Executes a setup script on first boot to deploy application services
 # ===========================================
 
 # -------------------------------------------
@@ -12,18 +15,18 @@
 # -------------------------------------------
 write_files:
   # =========================================
-  # File: Docker Compose YAML
-  # Path: /opt/app/docker-compose.yml
-  # Purpose: Store the docker-compose configuration
+  # File: Docker Swarm Stack YAML
+  # Path: /opt/app/stack.yml
+  # Purpose: Store the docker swarm stack configuration
   # Permissions: 0644 (read/write owner, read others)
   # Owner: root:root
-  # Content: Populated from template variable ${compose_yaml}
+  # Content: Populated from template variable ${stack_yaml}
   # =========================================
-  - path: /opt/app/docker-compose.yml
+  - path: /opt/app/stack.yml
     permissions: '0644'
     owner: root:root
     content: |
-      ${compose_yaml}
+      ${stack_yaml}
 
   # =========================================
   # File: Setup Script
@@ -44,8 +47,8 @@ write_files:
 # -------------------------------------------
 runcmd:
   # =========================================
-  # Command: Execute Setup Script
-  # Purpose: Run the setup script to deploy Docker services
-  # Notes: Runs automatically during instance initialization
+  # Initial Setup Execution
+  # Purpose: Executes the setup script that handles environment initialization
+  # Notes: runcmd executes during the first boot phase of cloud-init
   # =========================================
   - /usr/local/bin/setup.sh
