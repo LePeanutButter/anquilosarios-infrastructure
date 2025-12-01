@@ -163,7 +163,7 @@ For each VM:
 
 - Public IP, NIC, and Linux virtual machine.
 - Uses **Cloud-init** to install Docker and Docker Compose.
-- **Deploys three containerized services** (Svelte Frontend, .NET Backend, Unity WebGL) defined in `docker-compose.tpl` and pulled from the ACR.
+- **Deploys three containerized services** (Svelte Frontend, .NET Backend, Unity WebGL) defined in `stack.tpl` and pulled from the ACR.
 
 ## Maintainers
 
