@@ -194,12 +194,14 @@ jobs:
       - name: Set Azure Subscription
         run: az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
-      # Step 6: Auto-Import everything that already exists in Azure
-      - name: Automatic Terraform Import for All Resources
+      # Step 6: Remove Conflicting Resources from State
+      - name: Remove Conflicting Resources from State
         run: |
-          export TF_VAR_admin_public_key="${{ secrets.ADMIN_PUBLIC_KEY }}"
-          chmod +x ./auto-import.sh
-          ./auto-import.sh
+          terraform state rm 'module.network.azurerm_virtual_network.vnet'
+          terraform state rm 'module.compute.azurerm_public_ip.pubip[0]'
+          terraform state rm 'module.compute.azurerm_public_ip.pubip[1]'
+          terraform state rm 'module.loadbalancer.azurerm_public_ip.lb_pip'
+          terraform state rm 'module.network.azurerm_network_security_group.nsg'
 
       # Step 7: Generates a plan file (`tfplan.out`) containing planned changes.
       - name: Run Terraform plan and save
