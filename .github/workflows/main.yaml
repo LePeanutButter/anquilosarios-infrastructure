@@ -265,6 +265,11 @@ jobs:
           chmod +x ./auto-import.sh
           ./auto-import.sh
 
-      # Step 7: Applies the infrastructure changes from the plan with auto-approval.
+      # Step 7: Generate a fresh Terraform plan after imports. Imported from Azure, preventing stale plan errors during apply.
+      - name: Run Terraform plan and save
+        id: plan
+        run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
+
+      # Step 8: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
         run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
