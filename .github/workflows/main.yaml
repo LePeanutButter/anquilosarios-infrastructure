@@ -268,7 +268,7 @@ jobs:
 
       # Step 6: Refresh Terraform state to ensure no changes have occurred since the plan
       - name: Terraform Refresh
-        run: terraform refresh -input=false
+        run: terraform refresh -input=false -var="admin_public_key=${{ secrets.ADMIN_PUBLIC_KEY }}"
 
       # Step 7: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
