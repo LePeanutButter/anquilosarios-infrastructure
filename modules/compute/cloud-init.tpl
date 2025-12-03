@@ -14,4 +14,4 @@ write_files:
       ${setup_script}
 
 runcmd:
-  - [/usr/local/bin/setup.sh]
+  - /usr/local/bin/setup.sh

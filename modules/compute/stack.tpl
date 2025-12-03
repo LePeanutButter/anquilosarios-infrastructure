@@ -28,7 +28,6 @@ services:
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
-    ports: []
     networks:
       - default
     healthcheck:
@@ -48,7 +47,6 @@ services:
 
   dotnet_backend:
     image: ${acr_name}.azurecr.io/dotnet-backend:latest
-    ports: []
     networks:
       - default
     environment:
@@ -73,7 +71,6 @@ services:
 
   unity_webgl:
     image: ${acr_name}.azurecr.io/unity-webgl:latest
-    ports: []
     networks:
       - default
     healthcheck:

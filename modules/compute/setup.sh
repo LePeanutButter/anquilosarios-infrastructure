@@ -42,7 +42,6 @@ fi
 # Ensure Docker is running
 systemctl enable docker
 systemctl start docker
-systemctl restart docker
 
 # Give admin user Docker permissions
 if id -u "${ADMIN_USER}" >/dev/null 2>&1; then
@@ -59,4 +58,6 @@ if ! docker node ls >/dev/null 2>&1; then
 fi
 
 # Deploy stack
+docker stack rm appstack || true
+sleep 5
 docker stack deploy -c stack.yml appstack
