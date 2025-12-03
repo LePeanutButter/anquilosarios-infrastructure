@@ -276,7 +276,11 @@ jobs:
       # Step 5: Initializes Terraform environment before applying.
       - name: Terraform Init
         run: terraform init -input=false -upgrade
+      
+      # Step 6: Refresh states
+      - name: Refresh Terraform State
+        run: terraform refresh
 
-      # Step 6: Applies the infrastructure changes from the plan with auto-approval.
+      # Step 7: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
         run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
