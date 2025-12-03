@@ -181,12 +181,24 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false -upgrade
 
-      # Step 4: Generates a plan file (`tfplan.out`) containing planned changes.
+      # Step 4: Authenticate before running auto-import
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 5: Auto-Import everything that already exists in Azure
+      - name: Automatic Terraform Import for All Resources
+        run: |
+          chmod +x ./auto-import.sh
+          ./auto-import.sh
+
+      # Step 6: Generates a plan file (`tfplan.out`) containing planned changes.
       - name: Run Terraform plan and save
         id: plan
         run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
       
-      # Step 5: Saves the plan artifact for manual approval and apply.
+      # Step 7: Saves the plan artifact for manual approval and apply.
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
         with:
