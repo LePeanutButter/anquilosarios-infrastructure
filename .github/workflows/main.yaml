@@ -183,16 +183,27 @@ jobs:
 
       # Step 4: Authenticate before running auto-import
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 5: Generates a plan file (`tfplan.out`) containing planned changes.
+      # Step 5:
+      - name: Set Azure Subscription
+        run: az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      # Step 6: Auto-Import everything that already exists in Azure
+      - name: Automatic Terraform Import for All Resources
+        run: |
+          export TF_VAR_admin_public_key="${{ secrets.ADMIN_PUBLIC_KEY }}"
+          chmod +x ./auto-import.sh
+          ./auto-import.sh
+
+      # Step 7: Generates a plan file (`tfplan.out`) containing planned changes.
       - name: Run Terraform plan and save
         id: plan
         run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
       
-      # Step 6: Saves the plan artifact for manual approval and apply.
+      # Step 8: Saves the plan artifact for manual approval and apply.
       - name: Upload Terraform Plan Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -243,9 +254,6 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }} 
-      
-      - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
       # Step 4: Downloads the approved Terraform plan artifact (`tfplan.out`).
       - name: Download Verified Plan
@@ -257,19 +265,11 @@ jobs:
       # Step 5: Initializes Terraform environment before applying.
       - name: Terraform Init
         run: terraform init -input=false -upgrade
-      
-      # Step 6: Auto-Import everything that already exists in Azure
-      - name: Automatic Terraform Import for All Resources
-        run: |
-          export TF_VAR_admin_public_key="${{ secrets.ADMIN_PUBLIC_KEY }}"
-          chmod +x ./auto-import.sh
-          ./auto-import.sh
 
-      # Step 7: Generate a fresh Terraform plan after imports. Imported from Azure, preventing stale plan errors during apply.
-      - name: Run Terraform plan and save
-        id: plan
-        run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
+      # Step 6: Refresh Terraform state to ensure no changes have occurred since the plan
+      - name: Terraform Refresh
+        run: terraform refresh -input=false
 
-      # Step 8: Applies the infrastructure changes from the plan with auto-approval.
+      # Step 7: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
         run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
