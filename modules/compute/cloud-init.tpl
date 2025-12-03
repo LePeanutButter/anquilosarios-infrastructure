@@ -14,11 +14,5 @@ write_files:
       ${setup_script}
 
 runcmd:
-  - |
-    export ACR_NAME="${acr_name}"
-    export ADMIN_USERNAME="${admin_username}"
-    export ARM_CLIENT_ID="${ARM_CLIENT_ID}"
-    export ARM_CLIENT_SECRET="${ARM_CLIENT_SECRET}"
-    export ARM_TENANT_ID="${ARM_TENANT_ID}"
-    export ARM_SUBSCRIPTION_ID="${ARM_SUBSCRIPTION_ID}"
-    /usr/local/bin/setup.sh
+  - [ bash, -c, "export ACR_NAME='${acr_name}' ADMIN_USERNAME='${admin_username}' ARM_CLIENT_ID='${ARM_CLIENT_ID}' ARM_CLIENT_SECRET='${ARM_CLIENT_SECRET}' ARM_TENANT_ID='${ARM_TENANT_ID}' ARM_SUBSCRIPTION_ID='${ARM_SUBSCRIPTION_ID}' && /usr/local/bin/setup.sh" ]
+
