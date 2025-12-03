@@ -5,13 +5,13 @@ write_files:
     permissions: '0644'
     owner: root:root
     content: |
-${stack_yaml}
+      ${stack_yaml}
 
   - path: /usr/local/bin/setup.sh
     permissions: '0755'
     owner: root:root
     content: |
-${setup_script}
+      ${setup_script}
 
 runcmd:
   - [/usr/local/bin/setup.sh]
