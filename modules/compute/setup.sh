@@ -11,69 +11,51 @@
 
 set -euo pipefail
 
-#-----------------------------------------------------------------------------
-# Configuration
-#-----------------------------------------------------------------------------
 ADMIN_USER="${ADMIN_USERNAME:-azureuser}"
 APP_DIR="/opt/app"
 
-#-----------------------------------------------------------------------------
-# System update and prerequisites
-#-----------------------------------------------------------------------------
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common
 
-#-----------------------------------------------------------------------------
-# Docker installation (if not already present)
-#-----------------------------------------------------------------------------
+# Install Docker
 if ! command -v docker >/dev/null 2>&1; then
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmour -o /usr/share/keyrings/docker-archive-keyring.gpg || true
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+        | gpg --dearmour -o /usr/share/keyrings/docker-archive-keyring.gpg || true
+
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+      > /etc/apt/sources.list.d/docker.list
+
     apt-get update -y
     apt-get install -y docker-ce docker-ce-cli containerd.io
 fi
 
-#-----------------------------------------------------------------------------
-# Docker Compose plugin installation
-#-----------------------------------------------------------------------------
+# Install Docker Compose v2 plugin
 if [ ! -x /usr/libexec/docker/cli-plugins/docker-compose ]; then
     mkdir -p /usr/libexec/docker/cli-plugins
-    curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o /usr/libexec/docker/cli-plugins/docker-compose
+    curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+        -o /usr/libexec/docker/cli-plugins/docker-compose
     chmod +x /usr/libexec/docker/cli-plugins/docker-compose
-    ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
 fi
 
-#-----------------------------------------------------------------------------
-# Application directory and docker-compose file setup
-#-----------------------------------------------------------------------------
-mkdir -p "${APP_DIR}"
-if docker compose version >/dev/null 2>&1; then
-    docker compose up -d || true
-else
-    docker-compose up -d || true
-fi
-
-#-----------------------------------------------------------------------------
-# Ensure Docker service is running
-#-----------------------------------------------------------------------------
+# Ensure Docker is running
 systemctl enable docker
 systemctl start docker
 
-#-----------------------------------------------------------------------------
-# Grant Docker access to admin user
-#-----------------------------------------------------------------------------
+# Give admin user Docker permissions
 if id -u "${ADMIN_USER}" >/dev/null 2>&1; then
     usermod -aG docker "${ADMIN_USER}" || true
 fi
 
-#-----------------------------------------------------------------------------
-# Start containers using Docker Compose
-#-----------------------------------------------------------------------------
+# Prepare app directory
+mkdir -p "${APP_DIR}"
 cd "${APP_DIR}"
-# Prefer new 'docker compose' plugin; fallback to docker-compose if necessary
-if docker compose version >/dev/null 2>&1; then
-    docker compose up -d || true
-else
-    docker-compose up -d || true
+
+# Initialize Swarm (idempotent)
+if ! docker node ls >/dev/null 2>&1; then
+    docker swarm init --advertise-addr "$(hostname -I | awk '{print $1}')"
 fi
+
+# Deploy stack
+docker stack deploy -c stack.yml appstack
