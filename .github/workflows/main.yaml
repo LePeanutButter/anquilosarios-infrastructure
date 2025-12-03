@@ -261,6 +261,7 @@ jobs:
       # Step 6: Auto-Import everything that already exists in Azure
       - name: Automatic Terraform Import for All Resources
         run: |
+          export TF_VAR_admin_public_key="${{ secrets.ADMIN_PUBLIC_KEY }}"
           chmod +x ./auto-import.sh
           ./auto-import.sh
 
