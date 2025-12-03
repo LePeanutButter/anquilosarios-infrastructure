@@ -198,11 +198,7 @@ jobs:
       - name: Run Terraform plan and save
         id: plan
         run: terraform plan -var="force_recreate=true" -input=false -out=${{ env.TF_PLAN_FILE }}
-      
-      # Step 7: Refresh Terraform State
-      - name: Refresh Terraform State
-        run: terraform refresh -var="force_recreate=true"
 
-      # Step 8: Applies the infrastructure changes from the plan with auto-approval.
+      # Step 7: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
         run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
