@@ -105,6 +105,10 @@ services:
     ports: []
     networks:
       - default
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__MongoDB=${CONNECTIONSTRINGS__MONGODB}
+      - MongoDB__DatabaseName=${MONGODB__DATABASENAME}
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
       interval: 10s

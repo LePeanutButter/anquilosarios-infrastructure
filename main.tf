@@ -75,16 +75,17 @@ module "network" {
   - Purpose: Provisions Linux virtual machines with the specified configuration.
 */
 module "compute" {
-  source = "./modules/compute"
-
-  vm_count            = var.vm_count
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-  admin_public_key    = var.admin_public_key
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  acr_name            = var.acr_name
-  subnet_id           = module.network.subnet_id
+  source                     = "./modules/compute"
+  vm_count                   = var.vm_count
+  vm_size                    = var.vm_size
+  admin_username             = var.admin_username
+  admin_public_key           = var.admin_public_key
+  resource_group_name        = var.resource_group_name
+  location                   = var.location
+  acr_name                   = var.acr_name
+  subnet_id                  = module.network.subnet_id
+  CONNECTIONSTRINGS__MONGODB = var.CONNECTIONSTRINGS__MONGODB
+  MONGODB__DATABASENAME      = var.MONGODB__DATABASENAME
 }
 
 /*

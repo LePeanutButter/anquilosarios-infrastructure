@@ -3,7 +3,9 @@
 # -------------------------------------------
 locals {
   stack_yaml = templatefile("${path.module}/stack.tpl", {
-    acr_name = var.acr_name
+    acr_name                   = var.acr_name
+    CONNECTIONSTRINGS__MONGODB = var.CONNECTIONSTRINGS__MONGODB
+    MONGODB__DATABASENAME      = var.MONGODB__DATABASENAME
   })
 
   cloud_init = templatefile("${path.module}/cloud-init.tpl", {

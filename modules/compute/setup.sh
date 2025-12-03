@@ -42,6 +42,7 @@ fi
 # Ensure Docker is running
 systemctl enable docker
 systemctl start docker
+systemctl restart docker
 
 # Give admin user Docker permissions
 if id -u "${ADMIN_USER}" >/dev/null 2>&1; then

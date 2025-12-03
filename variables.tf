@@ -51,3 +51,13 @@ variable "acr_name" {
   type    = string
   default = "anquiloacr"
 }
+
+variable "CONNECTIONSTRINGS__MONGODB" {
+  description = "MongoDB connection string"
+  type        = string
+}
+
+variable "MONGODB__DATABASENAME" {
+  description = "MongoDB database name"
+  type        = string
+}
