@@ -217,6 +217,10 @@ jobs:
 
           terraform import module.network.azurerm_subnet.subnet "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/virtualNetworks/anquilo-vnet/subnets/default"
 
+          terraform import module.automation.azurerm_monitor_action_group.action_group "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Insights/actionGroups/ag-reboot-vm"
+
+          terraform import module.loadbalancer.azurerm_lb.lb "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/loadBalancers/anquilo-lb"
+
           echo "Imports completed (errors ignored if already imported)."
 
       # Step 7: Generates a plan file (`tfplan.out`) containing planned changes.
