@@ -1,3 +1,4 @@
+#cloud-config
 # ===========================================
 # Cloud-Init Configuration Template: cloud-config.tpl
 #
