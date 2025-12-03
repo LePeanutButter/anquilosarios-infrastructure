@@ -24,22 +24,10 @@ resource "azurerm_monitor_metric_alert" "lb_health_alert" {
   # Defines the logic for when the alert should be fired.
   criteria {
     metric_namespace = "Microsoft.Network/loadBalancers"
-    metric_name      = "HealthProbeStatus"
+    metric_name      = "DipAvailability"
     aggregation      = "Average"
     operator         = "LessThan"
-    threshold        = 1
-
-    dimension {
-      name     = "BackendPool"
-      operator = "Include"
-      values   = [var.backend_pool_name]
-    }
-
-    dimension {
-      name     = "HealthProbe"
-      operator = "Include"
-      values   = [var.probe_name]
-    }
+    threshold        = 100
   }
 
   # Sends notifications or triggers automated actions such as VM restart.
