@@ -15,10 +15,8 @@ set -e
 
 echo "Starting automatic Terraform import process..."
 
-SUBSCRIPTION="${ARM_SUBSCRIPTION_ID}"
-
-echo "Current subscription:"
-az account show --query "{name:name,id:id}" --output table
+SUBSCRIPTION=$(az account show --query "id" -o tsv)
+echo "Using subscription: $SUBSCRIPTION"
 
 #-------------------------------------------------------------------------------
 # IMPORT LIST
