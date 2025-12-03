@@ -30,7 +30,6 @@ echo "Using subscription: $SUBSCRIPTION"
 #   - If not found in Azure > left for Terraform to create
 #-------------------------------------------------------------------------------
 IMPORTS=(
-  "module.resource_group.azurerm_resource_group.rg|/subscriptions/$SUBSCRIPTION/resourceGroups/anquilosaurios-rg"
   "module.network.azurerm_virtual_network.vnet|/subscriptions/$SUBSCRIPTION/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/virtualNetworks/anquilo-vnet"
   "module.network.azurerm_subnet.subnet|/subscriptions/$SUBSCRIPTION/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/virtualNetworks/anquilo-vnet/subnets/default"
   "module.compute.azurerm_public_ip.pubip[0]|/subscriptions/$SUBSCRIPTION/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/publicIPAddresses/anquilo-vm-pip-0"
