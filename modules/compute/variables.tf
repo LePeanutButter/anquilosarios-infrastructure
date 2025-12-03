@@ -8,4 +8,6 @@ variable "acr_name" {}
 variable "subnet_id" {}
 variable "CONNECTIONSTRINGS__MONGODB" {}
 variable "MONGODB__DATABASENAME" {}
-variable "force_recreate" {}
+variable "force_recreate" {
+  type = string
+}
