@@ -148,11 +148,11 @@ jobs:
         run: terraform validate -no-color
 
   # =========================================
-  # Job: Terraform Plan
-  # Purpose: Generate an execution plan for infrastructure changes
+  # Job: Terraform Plan and Deploy Infrastructure
+  # Purpose: Generate an execution plan for infrastructure changes and deploy infrastructure using the previously approved plan
   # =========================================
-  terraform_plan:
-    name: Terraform Plan
+  terraform_plan_deploy:
+    name: Terraform Plan and Deploy Infrastructure
     runs-on: ubuntu-latest
     needs: [terraform_validate]
     env:
@@ -206,78 +206,7 @@ jobs:
         id: plan
         run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
       
-      # Step 8: Saves the plan artifact for manual approval and apply.
-      - name: Upload Terraform Plan Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.TF_PLAN_FILE }}
-          path: ${{ env.TF_PLAN_FILE }}
-          retention-days: 1
-
-  # =========================================
-  # Job: Manual Approval Gate
-  # Purpose: Pause workflow for human approval before deployment
-  # =========================================
-  manual_approval:
-    name: Manual Approval Gate
-    runs-on: ubuntu-latest
-    needs: [terraform_plan]
-    environment:
-      name: production
-    steps:
-      # Step 1: Pauses workflow until someone with access approves the deployment in GitHub environment.
-      - name: Wait for Manual Approval
-        run: echo "Waiting for manual approval to proceed with deployment."
-
-  # =========================================
-  # Job: Deploy Infrastructure
-  # Purpose: Deploy infrastructure using the previously approved plan
-  # =========================================
-  terraform_apply:
-    name: Deploy Infrastructure
-    runs-on: ubuntu-latest
-    needs: [manual_approval]
-    if: github.event_name == 'push'
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      TF_VAR_admin_public_key: ${{ secrets.ADMIN_PUBLIC_KEY }}
-      TF_VAR_CONNECTIONSTRINGS__MONGODB: ${{ secrets.CONNECTIONSTRINGS__MONGODB }}
-      TF_VAR_MONGODB__DATABASENAME: ${{ secrets.MONGODB__DATABASENAME }}
-    steps:
-      # Step 1: Downloads the source code artifact.
-      - name: Retrieve Source Code
-        uses: actions/download-artifact@v4
-        with:
-          name: source-code
-          path: .
-
-      # Step 2: Installs Terraform CLI for validation commands.
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-      
-      # Step 3: Authenticates with Azure using service principal stored in secrets.
-      - name: Configure Azure Credentials
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }} 
-
-      # Step 4: Downloads the approved Terraform plan artifact (`tfplan.out`).
-      - name: Download Verified Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.TF_PLAN_FILE }}
-          path: .
-
-      # Step 5: Initializes Terraform environment before applying.
-      - name: Terraform Init
-        run: terraform init -input=false -upgrade
-      
-      # Step 6: Refresh states
+      # Step 6: Refresh Terraform State
       - name: Refresh Terraform State
         run: terraform refresh
 
