@@ -39,6 +39,16 @@ if [ ! -x /usr/libexec/docker/cli-plugins/docker-compose ]; then
     chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 fi
 
+# Azure CLI Repository
+curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmour > microsoft.gpg
+sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+AZ_REPO=$(lsb_release -cs)
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+# Install Azure CLI
+sudo apt-get update -y
+sudo apt-get install -y azure-cli
+
 # Ensure Docker is running
 systemctl enable docker
 systemctl start docker
@@ -56,6 +66,14 @@ cd "${APP_DIR}"
 if ! docker node ls >/dev/null 2>&1; then
     docker swarm init --advertise-addr "$(hostname -I | awk '{print $1}')"
 fi
+
+# Login to ACR
+az acr login --name anquiloacr
+
+# Pull images
+docker pull anquiloacr.azurecr.io/dotnet-backend:latest
+docker pull anquiloacr.azurecr.io/svelte-frontend:latest
+docker pull anquiloacr.azurecr.io/unity-webgl:latest
 
 # Deploy stack
 docker stack rm appstack || true
