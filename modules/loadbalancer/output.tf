@@ -28,3 +28,11 @@ output "lb_id" {
   description = "The ID of the Azure Load Balancer."
   value       = azurerm_lb.lb.id
 }
+
+output "probe_name" {
+  value = azurerm_lb_probe.tcp_probe.name
+}
+
+output "backend_pool_name" {
+  value = azurerm_lb_backend_address_pool.bpool.name
+}

@@ -61,3 +61,12 @@ output "subnet_id" {
 output "lb_id" {
   value = module.loadbalancer.lb_id
 }
+
+output "probe_name" {
+  value = module.loadbalancer.probe_name
+}
+
+output "backend_pool_name" {
+  value = module.loadbalancer.backend_pool_name
+}
+

@@ -167,5 +167,7 @@ module "automation" {
   resource_group_name = var.resource_group_name
   location            = var.location
   lb_id               = module.loadbalancer.lb_id
+  probe_name          = module.loadbalancer.probe_name
+  backend_pool_name   = module.loadbalancer.backend_pool_name
   force_recreate      = var.force_recreate
 }
