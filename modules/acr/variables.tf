@@ -11,5 +11,6 @@ variable "location" {
 }
 
 variable "force_recreate" {
-  type = string
+  type    = bool
+  default = false
 }

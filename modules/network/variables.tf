@@ -2,5 +2,6 @@ variable "resource_group_name" {}
 variable "location" {}
 variable "vnet_name" {}
 variable "force_recreate" {
-  type = string
+  type    = bool
+  default = false
 }

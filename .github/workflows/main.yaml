@@ -213,6 +213,10 @@ jobs:
 
           terraform import module.network.azurerm_virtual_network.vnet /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/virtualNetworks/anquilo-vnet || true
 
+          terraform import module.automation.azurerm_automation_runbook.reboot_vm_runbook "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Automation/automationAccounts/auto-anquilosaurios-rg/runbooks/Reboot-Failed-VM"
+
+          terraform import module.network.azurerm_subnet.subnet "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/virtualNetworks/anquilo-vnet/subnets/default"
+
           echo "Imports completed (errors ignored if already imported)."
 
       # Step 7: Generates a plan file (`tfplan.out`) containing planned changes.

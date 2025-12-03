@@ -6,5 +6,6 @@ variable "vm_count" {}
 variable "nic_ids" {}
 variable "nic_ip_names" {}
 variable "force_recreate" {
-  type = string
+  type    = bool
+  default = false
 }

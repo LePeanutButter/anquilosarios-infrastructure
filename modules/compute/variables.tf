@@ -9,5 +9,6 @@ variable "subnet_id" {}
 variable "CONNECTIONSTRINGS__MONGODB" {}
 variable "MONGODB__DATABASENAME" {}
 variable "force_recreate" {
-  type = string
+  type    = bool
+  default = false
 }
