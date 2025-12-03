@@ -161,8 +161,8 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       TF_VAR_admin_public_key: ${{ secrets.ADMIN_PUBLIC_KEY }}
-      CONNECTIONSTRINGS__MONGODB: ${{ secrets.CONNECTIONSTRINGS__MONGODB }}
-      MONGODB__DATABASENAME: ${{ secrets.MONGODB__DATABASENAME }}
+      TF_VAR_CONNECTIONSTRINGS__MONGODB: ${{ secrets.CONNECTIONSTRINGS__MONGODB }}
+      TF_VAR_MONGODB__DATABASENAME: ${{ secrets.MONGODB__DATABASENAME }}
       
     outputs:
       plan_id: ${{ steps.plan.outputs.id }}
@@ -244,8 +244,8 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       TF_VAR_admin_public_key: ${{ secrets.ADMIN_PUBLIC_KEY }}
-      CONNECTIONSTRINGS__MONGODB: ${{ secrets.CONNECTIONSTRINGS__MONGODB }}
-      MONGODB__DATABASENAME: ${{ secrets.MONGODB__DATABASENAME }}
+      TF_VAR_CONNECTIONSTRINGS__MONGODB: ${{ secrets.CONNECTIONSTRINGS__MONGODB }}
+      TF_VAR_MONGODB__DATABASENAME: ${{ secrets.MONGODB__DATABASENAME }}
     steps:
       # Step 1: Downloads the source code artifact.
       - name: Retrieve Source Code
