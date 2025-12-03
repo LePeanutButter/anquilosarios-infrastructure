@@ -245,7 +245,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }} 
       
       - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: az account set --subscription ${{ secrets.ARM_SUBSCRIPTION }}
 
       # Step 4: Downloads the approved Terraform plan artifact (`tfplan.out`).
       - name: Download Verified Plan
