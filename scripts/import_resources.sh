@@ -45,4 +45,8 @@ terraform import module.loadbalancer.azurerm_lb_rule.http_rule "/subscriptions/$
 
 terraform import module.network.azurerm_subnet_network_security_group_association.subnet_nsg "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/virtualNetworks/anquilo-vnet/subnets/default"
 
+terraform import module.loadbalancer.azurerm_network_interface_backend_address_pool_association.nic_assoc[0] "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/anquilo-nic-0/ipConfigurations/internal|/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/loadBalancers/anquilo-lb/backendAddressPools/anquilo-bpool" || true
+
+terraform import module.loadbalancer.azurerm_network_interface_backend_address_pool_association.nic_assoc[1] "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/anquilo-nic-1/ipConfigurations/internal|/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/loadBalancers/anquilo-lb/backendAddressPools/anquilo-bpool" || true
+
 echo "Imports completed (errors ignored if already imported)."
