@@ -49,4 +49,6 @@ terraform import module.loadbalancer.azurerm_network_interface_backend_address_p
 
 terraform import module.loadbalancer.azurerm_network_interface_backend_address_pool_association.nic_assoc[1] "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/anquilo-nic-1/ipConfigurations/internal|/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/loadBalancers/anquilo-lb/backendAddressPools/anquilo-bpool" || true
 
+terraform import module.automation.azurerm_monitor_metric_alert.lb_health_alert "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Insights/metricAlerts/lb-probe-unhealthy-alert"
+
 echo "Imports completed (errors ignored if already imported)."
