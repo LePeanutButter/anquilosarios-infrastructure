@@ -47,16 +47,6 @@ output "admin_password" {
   sensitive = true
 }
 
-# Name of the created Resource Group
-output "rg_name" {
-  value = module.resource_group.rg_name
-}
-
-# Azure region where the Resource Group is deployed
-output "rg_location" {
-  value = module.resource_group.rg_location
-}
-
 # Name of the Virtual Network
 output "vnet_name" {
   value = module.network.vnet_name

@@ -36,7 +36,7 @@ resource "azurerm_public_ip" "lb_pip" {
     - resource: azurerm_lb.lb
     - name: "anquilo-lb"
     - location: var.location
-    - sku: Basic
+    - sku: Standard
     - frontend_ip_configuration: References the public IP created above
     - tags: Identifies project and environment
     - Purpose: Distributes inbound traffic across backend VMs and monitors health.
@@ -45,7 +45,7 @@ resource "azurerm_lb" "lb" {
   name                = "anquilo-lb"
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku                 = "Basic"
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name                 = "LoadBalancerFrontEnd"

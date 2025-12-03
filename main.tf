@@ -44,22 +44,6 @@ provider "azurerm" {
 */
 
 /*
-  Resource Group Module
-  ----------------------
-  - source: Path to the local resource group module.
-  - Inputs:
-      - resource_group_name: Name of the Azure Resource Group to create.
-      - location: Azure region where the resource group will be provisioned.
-  - Purpose: Creates a dedicated Azure Resource Group for organizing resources.
-*/
-module "resource_group" {
-  source = "./modules/resource_group"
-
-  resource_group_name = var.resource_group_name
-  location            = var.location
-}
-
-/*
   Network Module
   ----------------
   - source: Path to the local network module.
@@ -149,8 +133,8 @@ module "loadbalancer" {
 module "acr" {
   source              = "./modules/acr"
   acr_name            = var.acr_name
-  resource_group_name = module.resource_group.rg_name
-  location            = module.resource_group.rg_location
+  resource_group_name = var.resource_group_name
+  location            = var.location
 }
 
 /*
@@ -175,7 +159,7 @@ module "acr" {
 */
 module "automation" {
   source              = "./modules/automation"
-  resource_group_name = module.resource_group.rg_name
-  location            = module.resource_group.rg_location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   lb_id               = module.loadbalancer.lb_id
 }
