@@ -17,6 +17,9 @@ echo "Starting automatic Terraform import process..."
 
 SUBSCRIPTION="${ARM_SUBSCRIPTION_ID}"
 
+echo "Current subscription:"
+az account show --query "{name:name,id:id}" --output table
+
 #-------------------------------------------------------------------------------
 # IMPORT LIST
 # Each entry defines a Terraform address and its matching Azure resource ID.
@@ -24,9 +27,9 @@ SUBSCRIPTION="${ARM_SUBSCRIPTION_ID}"
 #     TF_ADDRESS|AZURE_ID
 #
 # These resources will be checked one by one:
-#   - If already in Terraform state → skipped
-#   - If found in Azure → imported to state
-#   - If not found in Azure → left for Terraform to create
+#   - If already in Terraform state > skipped
+#   - If found in Azure > imported to state
+#   - If not found in Azure > left for Terraform to create
 #-------------------------------------------------------------------------------
 IMPORTS=(
   "module.resource_group.azurerm_resource_group.rg|/subscriptions/$SUBSCRIPTION/resourceGroups/anquilosaurios-rg"
