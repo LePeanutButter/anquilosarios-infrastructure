@@ -221,8 +221,6 @@ jobs:
 
           terraform import module.loadbalancer.azurerm_lb.lb "/subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/loadBalancers/anquilo-lb"
 
-          terraform import module.loadbalancer.azurerm_lb.lb /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/loadBalancers/anquilo-lb
-
           terraform import module.loadbalancer.azurerm_lb_backend_address_pool.bpool /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/loadBalancers/anquilo-lb/backendAddressPools/anquilo-bpool
 
           terraform import module.loadbalancer.azurerm_lb_probe.tcp_probe /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/anquilosaurios-rg/providers/Microsoft.Network/loadBalancers/anquilo-lb/probes/tcp-probe
