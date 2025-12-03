@@ -9,8 +9,14 @@ locals {
   })
 
   cloud_init = templatefile("${path.module}/cloud-init.tpl", {
-    stack_yaml   = indent(6, local.stack_yaml)
-    setup_script = indent(6, file("${path.module}/setup.sh"))
+    stack_yaml          = indent(6, local.stack_yaml)
+    setup_script        = indent(6, file("${path.module}/setup.sh"))
+    acr_name            = var.acr_name
+    admin_username      = var.admin_username
+    ARM_CLIENT_ID       = var.ARM_CLIENT_ID
+    ARM_CLIENT_SECRET   = var.ARM_CLIENT_SECRET
+    ARM_TENANT_ID       = var.ARM_TENANT_ID
+    ARM_SUBSCRIPTION_ID = var.ARM_SUBSCRIPTION_ID
   })
 }
 

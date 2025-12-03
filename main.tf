@@ -88,6 +88,10 @@ module "compute" {
   force_recreate             = var.force_recreate
   CONNECTIONSTRINGS__MONGODB = var.CONNECTIONSTRINGS__MONGODB
   MONGODB__DATABASENAME      = var.MONGODB__DATABASENAME
+  ARM_CLIENT_ID              = var.ARM_CLIENT_ID
+  ARM_CLIENT_SECRET          = var.ARM_CLIENT_SECRET
+  ARM_TENANT_ID              = var.ARM_TENANT_ID
+  ARM_SUBSCRIPTION_ID        = var.ARM_SUBSCRIPTION_ID
 }
 
 /*

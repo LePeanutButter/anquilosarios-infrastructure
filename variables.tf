@@ -67,3 +67,23 @@ variable "MONGODB__DATABASENAME" {
   type        = string
 }
 
+variable "ARM_CLIENT_ID" {
+  description = "Azure Service Principal client ID for Terraform"
+  type        = string
+}
+
+variable "ARM_CLIENT_SECRET" {
+  description = "Azure Service Principal client secret for Terraform"
+  type        = string
+  sensitive   = true
+}
+
+variable "ARM_TENANT_ID" {
+  description = "Azure Tenant ID for Terraform"
+  type        = string
+}
+
+variable "ARM_SUBSCRIPTION_ID" {
+  description = "Azure Subscription ID for Terraform"
+  type        = string
+}

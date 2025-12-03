@@ -11,8 +11,13 @@
 
 set -euo pipefail
 
-ADMIN_USER="${ADMIN_USERNAME:-azureuser}"
 APP_DIR="/opt/app"
+ACR_NAME="${ACR_NAME:-anquiloacr}"
+ADMIN_USER="${ADMIN_USERNAME:-azureuser}"
+ARM_CLIENT_ID="${ARM_CLIENT_ID:-}"
+ARM_CLIENT_SECRET="${ARM_CLIENT_SECRET:-}"
+ARM_TENANT_ID="${ARM_TENANT_ID:-}"
+ARM_SUBSCRIPTION_ID="${ARM_SUBSCRIPTION_ID:-}"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
@@ -67,8 +72,14 @@ if ! docker node ls >/dev/null 2>&1; then
     docker swarm init --advertise-addr "$(hostname -I | awk '{print $1}')"
 fi
 
-# Login to ACR
-az acr login --name anquiloacr
+# Login to Azure using Service Principal
+az login --service-principal --username "$ARM_CLIENT_ID" --password "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" >/dev/null
+
+# Set the subscription
+az account set --subscription "$ARM_SUBSCRIPTION_ID"
+
+# Login to Azure Container Registry
+az acr login --name "$ACR_NAME"
 
 # Pull images
 docker pull anquiloacr.azurecr.io/dotnet-backend:latest
