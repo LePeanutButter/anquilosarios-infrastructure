@@ -28,4 +28,10 @@ resource "azurerm_container_registry" "acr" {
   location            = var.location
   sku                 = "Basic"
   admin_enabled       = true
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

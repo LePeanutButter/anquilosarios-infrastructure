@@ -12,14 +12,20 @@
     such as restarting a failed virtual machine.
 */
 resource "azurerm_automation_account" "auto_account" {
-    name                = "auto-${var.resource_group_name}"
-    location            = var.location
-    resource_group_name = var.resource_group_name
-    sku_name            = "Basic"
+  name                = "auto-${var.resource_group_name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku_name            = "Basic"
 
-    identity {
-        type = "SystemAssigned"
-    }
+  identity {
+    type = "SystemAssigned"
+  }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -41,12 +47,18 @@ resource "azurerm_automation_account" "auto_account" {
     which is required for Restart-AzVM.
 */
 resource "azurerm_automation_runbook" "reboot_vm_runbook" {
-    name                    = "Reboot-Failed-VM"
-    location                = var.location
-    resource_group_name     = var.resource_group_name
-    automation_account_name = azurerm_automation_account.auto_account.name
-    runbook_type            = "PowerShell"
-    log_progress            = true
-    log_verbose             = true
-    content                 = file("${path.module}/reboot.ps1")
+  name                    = "Reboot-Failed-VM"
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  automation_account_name = azurerm_automation_account.auto_account.name
+  runbook_type            = "PowerShell"
+  log_progress            = true
+  log_verbose             = true
+  content                 = file("${path.module}/reboot.ps1")
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

@@ -59,6 +59,7 @@ module "network" {
   resource_group_name = var.resource_group_name
   location            = var.location
   vnet_name           = module.network.vnet_name
+  force_recreate      = var.force_recreate
 }
 
 /*
@@ -84,6 +85,7 @@ module "compute" {
   location                   = var.location
   acr_name                   = var.acr_name
   subnet_id                  = module.network.subnet_id
+  force_recreate             = var.force_recreate
   CONNECTIONSTRINGS__MONGODB = var.CONNECTIONSTRINGS__MONGODB
   MONGODB__DATABASENAME      = var.MONGODB__DATABASENAME
 }
@@ -112,6 +114,7 @@ module "loadbalancer" {
   vm_count            = var.vm_count
   nic_ids             = module.compute.nic_ids
   nic_ip_names        = module.compute.nic_ip_names
+  force_recreate      = var.force_recreate
 }
 
 /*
@@ -163,4 +166,5 @@ module "automation" {
   resource_group_name = var.resource_group_name
   location            = var.location
   lb_id               = module.loadbalancer.lb_id
+  force_recreate      = var.force_recreate
 }

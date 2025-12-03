@@ -10,7 +10,7 @@
       - Enables other resources or role assignments to reference the RG dynamically without hardcoding the ID.
 */
 data "azurerm_resource_group" "rg" {
-    name = var.resource_group_name
+  name = var.resource_group_name
 }
 
 /*
@@ -27,7 +27,13 @@ data "azurerm_resource_group" "rg" {
     or restarting virtual machines inside the target Resource Group.
 */
 resource "azurerm_role_assignment" "auto_account_rbac" {
-    scope                = data.azurerm_resource_group.rg.id
-    role_definition_name = "Contributor"
-    principal_id         = azurerm_automation_account.auto_account.identity[0].principal_id
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_automation_account.auto_account.identity[0].principal_id
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

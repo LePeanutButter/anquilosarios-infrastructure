@@ -28,6 +28,12 @@ resource "azurerm_public_ip" "lb_pip" {
     project = "anquilosaurios"
     env     = "production"
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -56,6 +62,12 @@ resource "azurerm_lb" "lb" {
     project = "anquilosaurios"
     env     = "production"
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -72,6 +84,12 @@ resource "azurerm_lb_backend_address_pool" "bpool" {
   loadbalancer_id = azurerm_lb.lb.id
 
   depends_on = [azurerm_lb.lb]
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -95,6 +113,12 @@ resource "azurerm_lb_probe" "tcp_probe" {
   number_of_probes    = 2
 
   depends_on = [azurerm_lb.lb]
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -121,6 +145,12 @@ resource "azurerm_lb_rule" "http_rule" {
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.bpool.id]
   probe_id                       = azurerm_lb_probe.tcp_probe.id
   idle_timeout_in_minutes        = 4
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }
 
 /*
@@ -139,4 +169,10 @@ resource "azurerm_network_interface_backend_address_pool_association" "nic_assoc
   network_interface_id    = var.nic_ids[count.index]
   ip_configuration_name   = var.nic_ip_names[count.index]
   backend_address_pool_id = azurerm_lb_backend_address_pool.bpool.id
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

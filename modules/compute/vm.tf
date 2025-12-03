@@ -66,4 +66,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
     environment = "production"
     project     = "anquilosaurios"
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

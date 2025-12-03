@@ -52,6 +52,11 @@ variable "acr_name" {
   default = "anquiloacr"
 }
 
+variable "force_recreate" {
+  type    = bool
+  default = false
+}
+
 variable "CONNECTIONSTRINGS__MONGODB" {
   description = "MongoDB connection string"
   type        = string
@@ -61,3 +66,4 @@ variable "MONGODB__DATABASENAME" {
   description = "MongoDB database name"
   type        = string
 }
+

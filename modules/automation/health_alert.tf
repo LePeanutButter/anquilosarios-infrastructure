@@ -13,25 +13,31 @@
       via an Action Group.
 */
 resource "azurerm_monitor_metric_alert" "lb_health_alert" {
-    name                = "lb-probe-unhealthy-alert"
-    resource_group_name = var.resource_group_name
-    scopes              = [var.lb_id]
-    description         = "Triggers a VM restart if the Load Balancer probe fails."
-    severity            = 3
-    frequency           = "PT1M"
-    window_size         = "PT5M"
+  name                = "lb-probe-unhealthy-alert"
+  resource_group_name = var.resource_group_name
+  scopes              = [var.lb_id]
+  description         = "Triggers a VM restart if the Load Balancer probe fails."
+  severity            = 3
+  frequency           = "PT1M"
+  window_size         = "PT5M"
 
-    # Defines the logic for when the alert should be fired.
-    criteria {
-        metric_namespace = "Microsoft.Network/loadBalancers"
-        metric_name      = "ProbeStatus"
-        aggregation      = "Minimum"
-        operator         = "LessThan"
-        threshold        = 1 
-    }
+  # Defines the logic for when the alert should be fired.
+  criteria {
+    metric_namespace = "Microsoft.Network/loadBalancers"
+    metric_name      = "ProbeStatus"
+    aggregation      = "Minimum"
+    operator         = "LessThan"
+    threshold        = 1
+  }
 
-    # Sends notifications or triggers automated actions such as VM restart.
-    action {
-        action_group_id = azurerm_monitor_action_group.action_group.id
-    }
+  # Sends notifications or triggers automated actions such as VM restart.
+  action {
+    action_group_id = azurerm_monitor_action_group.action_group.id
+  }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.force_recreate_sentinel
+    ]
+  }
 }

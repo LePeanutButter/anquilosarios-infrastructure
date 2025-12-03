@@ -190,28 +190,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 5:
+      # Step 5: Set Azure Subscription
       - name: Set Azure Subscription
         run: az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
-      # Step 6: Remove Conflicting Resources from State
-      - name: Remove Conflicting Resources from State
-        run: |
-          terraform state rm 'module.network.azurerm_virtual_network.vnet'
-          terraform state rm 'module.compute.azurerm_public_ip.pubip[0]'
-          terraform state rm 'module.compute.azurerm_public_ip.pubip[1]'
-          terraform state rm 'module.loadbalancer.azurerm_public_ip.lb_pip'
-          terraform state rm 'module.network.azurerm_network_security_group.nsg'
-
-      # Step 7: Generates a plan file (`tfplan.out`) containing planned changes.
+      # Step 6: Generates a plan file (`tfplan.out`) containing planned changes.
       - name: Run Terraform plan and save
         id: plan
-        run: terraform plan -input=false -out=${{ env.TF_PLAN_FILE }}
+        run: terraform plan \
+          -var="force_recreate=true" \
+          -input=false \
+          -out=${{ env.TF_PLAN_FILE }}
       
-      # Step 6: Refresh Terraform State
+      # Step 7: Refresh Terraform State
       - name: Refresh Terraform State
-        run: terraform refresh
+        run: terraform refresh -var="force_recreate=true"
 
-      # Step 7: Applies the infrastructure changes from the plan with auto-approval.
+      # Step 8: Applies the infrastructure changes from the plan with auto-approval.
       - name: Execute Terraform Apply
         run: terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
