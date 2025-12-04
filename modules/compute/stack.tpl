@@ -31,8 +31,6 @@ services:
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
-    ports:
-      - "3000:3000"
     networks:
       - default
     healthcheck:
@@ -47,8 +45,10 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.svelte.entrypoints=web"
         - "traefik.http.routers.svelte.rule=PathPrefix(`/app`)"
         - "traefik.http.services.svelte.loadbalancer.server.port=3000"
+        - "traefik.http.routers.root.entrypoints=web"
         - "traefik.http.routers.root.rule=Path(`/`)"
         - "traefik.http.routers.root.middlewares=redirect-to-app"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$$"
@@ -57,8 +57,6 @@ services:
 
   dotnet_backend:
     image: ${acr_name}.azurecr.io/dotnet-backend:latest
-    ports:
-      - "5000:5000"
     networks:
       - default
     environment:
@@ -78,6 +76,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.backend.entrypoints=web"
         - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
         - "traefik.http.services.backend.loadbalancer.server.port=5000"
         - "traefik.http.services.backend.loadbalancer.server.scheme=http"
@@ -99,6 +98,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.unity.entrypoints=web"
         - "traefik.http.routers.unity.rule=PathPrefix(`/play`)"
         - "traefik.http.services.unity.loadbalancer.server.port=8080"
 
