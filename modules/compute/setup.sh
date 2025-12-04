@@ -82,9 +82,17 @@ az account set --subscription "$ARM_SUBSCRIPTION_ID"
 az acr login --name "$ACR_NAME"
 
 # Pull images
-docker pull anquiloacr.azurecr.io/dotnet-backend:latest || true
-docker pull anquiloacr.azurecr.io/svelte-frontend:latest || true
-docker pull anquiloacr.azurecr.io/unity-webgl:latest || true
+if az acr repository show-tags --name "$ACR_NAME" --repository dotnet-backend --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/dotnet-backend:latest
+fi
+
+if az acr repository show-tags --name "$ACR_NAME" --repository svelte-frontend --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/svelte-frontend:latest
+fi
+
+if az acr repository show-tags --name "$ACR_NAME" --repository unity-webgl --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/unity-webgl:latest
+fi
 
 # Deploy stack
 docker stack rm appstack || true

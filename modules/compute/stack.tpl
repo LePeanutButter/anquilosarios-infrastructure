@@ -4,7 +4,8 @@ services:
   traefik:
     image: traefik:v3.1
     command:
-      - "--providers.docker.swarmMode=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarm=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     ports:
