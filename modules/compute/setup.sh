@@ -158,20 +158,18 @@ az acr login --name "$ACR_NAME"
 # Pull latest images
 if az acr repository show-tags --name "$ACR_NAME" --repository dotnet-backend --query "[?@=='latest']" -o tsv | grep -q latest; then
     docker pull $ACR_NAME.azurecr.io/dotnet-backend:latest
+    docker service update --force appstack_dotnet-backend
 fi
 
 if az acr repository show-tags --name "$ACR_NAME" --repository svelte-frontend --query "[?@=='latest']" -o tsv | grep -q latest; then
     docker pull $ACR_NAME.azurecr.io/svelte-frontend:latest
+    docker service update --force appstack_svelte-frontend
 fi
 
 if az acr repository show-tags --name "$ACR_NAME" --repository unity-webgl --query "[?@=='latest']" -o tsv | grep -q latest; then
     docker pull $ACR_NAME.azurecr.io/unity-webgl:latest
+    docker service update --force appstack_unity-webgl
 fi
-
-# Force service update so Swarm redeploys with the new images
-docker service update --force appstack_dotnet-backend
-docker service update --force appstack_svelte-frontend
-docker service update --force appstack_unity-webgl
 EOF
 
 chmod +x /opt/app/refresh.sh
@@ -180,5 +178,5 @@ chmod +x /opt/app/refresh.sh
 CRON_LINE="*/2 * * * * /opt/app/refresh.sh >> /var/log/app_refresh.log 2>&1"
 
 # Only add if not already present
-( crontab -l 2>/dev/null | grep -F "$CRON_LINE" >/dev/null ) || \
-  ( crontab -l 2>/dev/null; echo "$CRON_LINE" ) | crontab -
+sudo crontab -u azureuser -l 2>/dev/null | grep -F "$CRON_LINE" >/dev/null || \
+    ( sudo crontab -u azureuser -l 2>/dev/null; echo "$CRON_LINE" ) | sudo crontab -u azureuser -
