@@ -32,7 +32,6 @@ terraform {
 */
 provider "azurerm" {
   features {}
-  skip_provider_registration = true
 }
 
 /*
@@ -85,6 +84,7 @@ module "compute" {
   location                   = var.location
   acr_name                   = var.acr_name
   subnet_id                  = module.network.subnet_id
+  nsg_id                     = module.network.nsg_id
   force_recreate             = var.force_recreate
   CONNECTIONSTRINGS__MONGODB = var.CONNECTIONSTRINGS__MONGODB
   MONGODB__DATABASENAME      = var.MONGODB__DATABASENAME

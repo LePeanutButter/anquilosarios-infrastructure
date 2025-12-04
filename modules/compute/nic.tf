@@ -22,3 +22,9 @@ resource "azurerm_network_interface" "nic" {
     ]
   }
 }
+
+resource "azurerm_network_interface_security_group_association" "nic_nsg" {
+  count                     = var.vm_count
+  network_interface_id      = azurerm_network_interface.nic[count.index].id
+  network_security_group_id = var.nsg_id
+}

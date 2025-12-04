@@ -70,3 +70,7 @@ output "backend_pool_name" {
   value = module.loadbalancer.backend_pool_name
 }
 
+output "nsg_id" {
+  value = module.network.nsg_id
+}
+

@@ -23,3 +23,7 @@ output "subnet_id" {
     description = "The ID of the subnet created inside the VNet."
     value       = azurerm_subnet.subnet.id
 }
+
+output "nsg_id" {
+    value = azurerm_network_security_group.nsg.id
+}
