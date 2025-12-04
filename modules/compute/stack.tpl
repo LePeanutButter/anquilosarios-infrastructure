@@ -36,7 +36,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/app/api/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://0.0.0.0:3000/app/api/health"]
       interval: 10s
       timeout: 3s
       retries: 3
