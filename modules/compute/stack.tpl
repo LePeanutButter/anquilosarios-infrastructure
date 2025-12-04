@@ -46,7 +46,7 @@ services:
       - "traefik.http.services.svelte.loadbalancer.server.port=3000"
       - "traefik.http.routers.root.rule=Path(`/`)"
       - "traefik.http.routers.root.middlewares=redirect-to-app"
-      - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$$"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
 
