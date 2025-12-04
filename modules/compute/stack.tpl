@@ -4,19 +4,20 @@ services:
   traefik:
     image: traefik:v3.6.1
     command:
-      - "--providers.docker"
-      - "--providers.swarm"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--ping=true"
+      - "--providers.swarm=true"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.ping.address=:8082"
+      - "--ping.entrypoint=ping"
     ports:
       - "80:80"
+      - "8082:8082"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/ping"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8082/ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -30,10 +31,12 @@ services:
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
+    ports:
+      - "3000:3000"
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/app/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/app/api/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -54,6 +57,8 @@ services:
 
   dotnet_backend:
     image: ${acr_name}.azurecr.io/dotnet-backend:latest
+    ports:
+      - "5000:5000"
     networks:
       - default
     environment:
