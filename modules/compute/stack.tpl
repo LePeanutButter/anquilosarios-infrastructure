@@ -31,7 +31,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      test: ["CMD", "wget", "--spider", "-q", "http://svelte_frontend:3000"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -43,18 +43,24 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.svelte.rule=PathPrefix(`/app`)"
-      - "traefik.http.services.svelte.loadbalancer.server.port=80"
+      - "traefik.http.services.svelte.loadbalancer.server.port=3000"
+      - "traefik.http.routers.root.rule=Path(`/`)"
+      - "traefik.http.routers.root.middlewares=redirect-to-app"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app"
+      - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
 
   dotnet_backend:
     image: ${acr_name}.azurecr.io/dotnet-backend:latest
     networks:
       - default
     environment:
+      - ASPNETCORE_URLS=http://+:5000
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__MongoDB=${CONNECTIONSTRINGS__MONGODB}
       - MongoDB__DatabaseName=${MONGODB__DATABASENAME}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://dotnet_backend:5000/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -74,7 +80,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      test: ["CMD", "wget", "--spider", "-q", "http://unity_webgl:8080"]
       interval: 10s
       timeout: 3s
       retries: 3
