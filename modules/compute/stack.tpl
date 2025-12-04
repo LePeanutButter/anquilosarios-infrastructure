@@ -5,7 +5,7 @@ services:
     image: traefik:v3.1
     command:
       - "--providers.docker=true"
-      - "--providers.docker.swarm=true"
+      - "--providers.swarm=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     ports:
@@ -32,7 +32,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://svelte_frontend:3000"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -61,7 +61,7 @@ services:
       - ConnectionStrings__MongoDB=${CONNECTIONSTRINGS__MONGODB}
       - MongoDB__DatabaseName=${MONGODB__DATABASENAME}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://dotnet_backend:5000/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -81,7 +81,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://unity_webgl:8080"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
       interval: 10s
       timeout: 3s
       retries: 3
