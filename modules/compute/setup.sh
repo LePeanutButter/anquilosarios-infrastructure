@@ -20,28 +20,57 @@ ARM_TENANT_ID="${ARM_TENANT_ID:-}"
 ARM_SUBSCRIPTION_ID="${ARM_SUBSCRIPTION_ID:-}"
 
 export DEBIAN_FRONTEND=noninteractive
+
+# Basic packages
 apt-get update -y
-apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common
+apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    software-properties-common
 
-# Install Docker
-if ! command -v docker >/dev/null 2>&1; then
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-        | gpg --dearmour -o /usr/share/keyrings/docker-archive-keyring.gpg || true
-
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-      > /etc/apt/sources.list.d/docker.list
-
-    apt-get update -y
-    apt-get install -y docker-ce docker-ce-cli containerd.io
+# Add Docker official GPG key and repository (idempotent)
+if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 fi
 
-# Install Docker Compose v2 plugin
-if [ ! -x /usr/libexec/docker/cli-plugins/docker-compose ]; then
-    mkdir -p /usr/libexec/docker/cli-plugins
-    curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
-        -o /usr/libexec/docker/cli-plugins/docker-compose
-    chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+ARCH="$(dpkg --print-architecture)"
+CODENAME="$(lsb_release -cs)"
+DOCKER_REPO="deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${CODENAME} stable"
+
+if ! grep -Fxq "$DOCKER_REPO" /etc/apt/sources.list.d/docker.list 2>/dev/null; then
+    echo "$DOCKER_REPO" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+fi
+
+apt-get update -y
+
+# Install the exact Docker CE and CLI versions requested, plus supporting packages
+apt-get install -y \
+  docker-ce=5:28.5.2-1~ubuntu.22.04~jammy \
+  docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin
+
+# Hold packages to avoid automatic upgrades that could change API behavior
+apt-mark hold docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin || true
+
+# Ensure Docker CLI plugin directory exists (some distros use /usr/libexec or /usr/local/lib)
+DOCKER_CLI_PLUGINS_DIR="/usr/libexec/docker/cli-plugins"
+if [ ! -d "$DOCKER_CLI_PLUGINS_DIR" ]; then
+    DOCKER_CLI_PLUGINS_DIR="/usr/local/lib/docker/cli-plugins"
+    mkdir -p "$DOCKER_CLI_PLUGINS_DIR"
+fi
+
+# Install docker-compose v2 plugin binary if missing (idempotent)
+COMPOSE_BIN="$DOCKER_CLI_PLUGINS_DIR/docker-compose"
+if [ ! -x "$COMPOSE_BIN" ]; then
+    curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(dpkg --print-architecture)" \
+        -o "$COMPOSE_BIN"
+    chmod +x "$COMPOSE_BIN"
 fi
 
 # Azure CLI Repository

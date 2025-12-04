@@ -2,14 +2,12 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v3.1
+    image: traefik:v3.6.1
     command:
-      - "--api.docker=true"
-      - "--providers.docker.apiVersion=1.44"
-      - "--providers.swarm.apiVersion=1.44"
-      - "--providers.docker=true"
-      - "--providers.swarm=true"
+      - "--providers.docker"
+      - "--providers.swarm"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
@@ -18,7 +16,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/ping"] 
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -101,3 +99,4 @@ services:
 networks:
   default:
     driver: overlay
+    attachable: true
