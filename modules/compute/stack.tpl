@@ -66,7 +66,7 @@ services:
       - ConnectionStrings__MongoDB=${CONNECTIONSTRINGS__MONGODB}
       - MongoDB__DatabaseName=${MONGODB__DATABASENAME}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/api/health"]
       interval: 10s
       timeout: 3s
       retries: 3

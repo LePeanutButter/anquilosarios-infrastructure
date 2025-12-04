@@ -127,3 +127,58 @@ fi
 docker stack rm appstack || true
 sleep 5
 docker stack deploy -c stack.yml appstack
+
+cat <<EOF >/opt/app/env.sh
+export ACR_NAME="${ACR_NAME:-anquiloacr}"
+export ARM_CLIENT_ID="${ARM_CLIENT_ID:-}"
+export ARM_CLIENT_SECRET="${ARM_CLIENT_SECRET:-}"
+export ARM_TENANT_ID="${ARM_TENANT_ID:-}"
+export ARM_SUBSCRIPTION_ID="${ARM_SUBSCRIPTION_ID:-}"
+EOF
+
+# Restrict access: only root can read/write
+chmod 600 /opt/app/env.sh
+chown root:root /opt/app/env.sh
+
+# Refresh script with the same environment variables
+cat <<'EOF' >/opt/app/refresh.sh
+#!/bin/bash
+set -euo pipefail
+source /opt/app/env.sh
+
+# Login to Azure using Service Principal
+az login --service-principal --username "$ARM_CLIENT_ID" --password "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" >/dev/null
+
+# Set the subscription
+az account set --subscription "$ARM_SUBSCRIPTION_ID"
+
+# Login to Azure Container Registry
+az acr login --name "$ACR_NAME"
+
+# Pull latest images
+if az acr repository show-tags --name "$ACR_NAME" --repository dotnet-backend --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/dotnet-backend:latest
+fi
+
+if az acr repository show-tags --name "$ACR_NAME" --repository svelte-frontend --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/svelte-frontend:latest
+fi
+
+if az acr repository show-tags --name "$ACR_NAME" --repository unity-webgl --query "[?@=='latest']" -o tsv | grep -q latest; then
+    docker pull $ACR_NAME.azurecr.io/unity-webgl:latest
+fi
+
+# Force service update so Swarm redeploys with the new images
+docker service update --force appstack_dotnet-backend
+docker service update --force appstack_svelte-frontend
+docker service update --force appstack_unity-webgl
+EOF
+
+chmod +x /opt/app/refresh.sh
+
+# Add cron job
+CRON_LINE="*/2 * * * * /opt/app/refresh.sh >> /var/log/app_refresh.log 2>&1"
+
+# Only add if not already present
+( crontab -l 2>/dev/null | grep -F "$CRON_LINE" >/dev/null ) || \
+  ( crontab -l 2>/dev/null; echo "$CRON_LINE" ) | crontab -
