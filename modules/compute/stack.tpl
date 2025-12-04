@@ -4,6 +4,9 @@ services:
   traefik:
     image: traefik:v3.1
     command:
+      - "--api.docker=true"
+      - "--providers.docker.apiVersion=1.44"
+      - "--providers.swarm.apiVersion=1.44"
       - "--providers.docker=true"
       - "--providers.swarm=true"
       - "--providers.docker.exposedbydefault=false"
@@ -32,7 +35,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/app"]
       interval: 10s
       timeout: 3s
       retries: 3
