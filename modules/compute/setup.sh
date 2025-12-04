@@ -82,9 +82,9 @@ az account set --subscription "$ARM_SUBSCRIPTION_ID"
 az acr login --name "$ACR_NAME"
 
 # Pull images
-docker pull anquiloacr.azurecr.io/dotnet-backend:latest
-docker pull anquiloacr.azurecr.io/svelte-frontend:latest
-docker pull anquiloacr.azurecr.io/unity-webgl:latest
+docker pull anquiloacr.azurecr.io/dotnet-backend:latest || true
+docker pull anquiloacr.azurecr.io/svelte-frontend:latest || true
+docker pull anquiloacr.azurecr.io/unity-webgl:latest || true
 
 # Deploy stack
 docker stack rm appstack || true
