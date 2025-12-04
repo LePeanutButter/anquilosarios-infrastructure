@@ -30,10 +30,12 @@ services:
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
+    ports:
+      - "3000:3000"
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/app"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/app/api/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -54,6 +56,8 @@ services:
 
   dotnet_backend:
     image: ${acr_name}.azurecr.io/dotnet-backend:latest
+    ports:
+      - "5000:5000"
     networks:
       - default
     environment:
@@ -75,6 +79,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=5000"
+      - "traefik.http.services.backend.loadbalancer.server.scheme=http"
 
 
   unity_webgl:
