@@ -51,4 +51,8 @@ terraform import module.loadbalancer.azurerm_network_interface_backend_address_p
 
 terraform import module.automation.azurerm_monitor_metric_alert.lb_health_alert "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Insights/metricAlerts/lb-probe-unhealthy-alert"
 
+terraform import module.compute.azurerm_network_interface_security_group_association.nic_nsg[0] "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/anquilo-nic-0|/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkSecurityGroups/anquilo-nsg"
+
+terraform import module.compute.azurerm_network_interface_security_group_association.nic_nsg[1] "/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/anquilo-nic-1|/subscriptions/$SUBS/resourceGroups/$RG/providers/Microsoft.Network/networkSecurityGroups/anquilo-nsg"
+
 echo "Imports completed (errors ignored if already imported)."
