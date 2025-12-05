@@ -123,6 +123,25 @@ if az acr repository show-tags --name "$ACR_NAME" --repository unity-webgl --que
     docker pull $ACR_NAME.azurecr.io/unity-webgl:latest
 fi
 
+CERT_DIR="./certs"
+KEY_FILE="${CERT_DIR}/dummy.key"
+CERT_FILE="${CERT_DIR}/dummy.pem"
+
+mkdir -p "$CERT_DIR"
+
+if [ ! -f "$KEY_FILE" ] || [ ! -f "$CERT_FILE" ]; then
+    if ! command -v openssl &> /dev/null
+    then
+        if ! sudo apt-get install -y openssl; then
+            exit 1
+        fi
+    fi
+    
+    openssl genrsa -out "$KEY_FILE" 2048
+    
+    openssl req -new -x509 -key "$KEY_FILE" -out "$CERT_FILE" -days 365 -subj "/CN=localhost"
+fi
+
 # Deploy stack
 docker stack rm appstack || true
 sleep 5
