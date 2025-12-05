@@ -52,7 +52,7 @@ services:
         - "traefik.http.routers.catchall.rule=PathPrefix(`/`)"
         - "traefik.http.routers.catchall.priority=1"
         - "traefik.http.routers.catchall.middlewares=redirect-to-app"
-        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^.*"
+        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^(?!/app)(?!/play).*"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
 
