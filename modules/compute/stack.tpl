@@ -7,20 +7,19 @@ services:
       - "--ping=true"
       - "--providers.swarm=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.http.tls.certificates=default"
-      - "--entrypoints.websecure.http.tls.certificates.0.certFile=/certs/dummy.pem"
-      - "--entrypoints.websecure.http.tls.certificates.0.keyFile=/certs/dummy.key"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
       - "--entrypoints.ping.address=:8082"
       - "--ping.entrypoint=ping"
+      - "--providers.file.filename=/etc/traefik/tls.yml"
     ports:
       - "80:80"
       - "443:443"
       - "8082:8082"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./certs:/certs"
+      - "/opt/app/certs:/certs"
+      - "/opt/app/traefik/tls.yml:/etc/traefik/tls.yml:ro"
     networks:
       - default
     healthcheck:
@@ -59,7 +58,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.svelte.entrypoints=websecure" 
+        - "traefik.http.routers.svelte.entrypoints=websecure"
         - "traefik.http.routers.svelte.rule=PathPrefix(`/app`)"
         - "traefik.http.services.svelte.loadbalancer.server.port=3000"
         - "traefik.http.services.svelte.loadbalancer.server.scheme=http"

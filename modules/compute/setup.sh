@@ -142,6 +142,19 @@ if [ ! -f "$KEY_FILE" ] || [ ! -f "$CERT_FILE" ]; then
     openssl req -new -x509 -key "$KEY_FILE" -out "$CERT_FILE" -days 365 -subj "/CN=localhost"
 fi
 
+TLS_FILE="./traefik/tls.yml"
+
+mkdir -p "$(dirname "$TLS_FILE")"
+
+cat > "$TLS_FILE" <<EOF
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/dummy.pem
+        keyFile: /certs/dummy.key
+EOF
+
 # Deploy stack
 docker stack rm appstack || true
 sleep 5
