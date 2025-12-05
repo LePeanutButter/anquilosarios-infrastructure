@@ -7,9 +7,9 @@ services:
       - "--ping=true"
       - "--providers.swarm=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.http.tls.certResolver=default"
-      - "--entrypoints.websecure.http.tls.stores.default.defaultCertificate.certFile=/certs/dummy.pem"
-      - "--entrypoints.websecure.http.tls.stores.default.defaultCertificate.keyFile=/certs/dummy.key"
+      - "--entrypoints.websecure.http.tls.certificates=default"
+      - "--entrypoints.websecure.http.tls.certificates.0.certFile=/certs/dummy.pem"
+      - "--entrypoints.websecure.http.tls.certificates.0.keyFile=/certs/dummy.key"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
       - "--entrypoints.ping.address=:8082"
@@ -41,7 +41,7 @@ services:
         - "traefik.http.routers.http-catchall.entrypoints=web"
         - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
         - "traefik.http.routers.http-catchall.middlewares=https-redirect"
-        - "traefik.http.routers.http-catchall.priority=10"
+        - "traefik.http.routers.http-catchall.priority=1"
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
@@ -63,11 +63,12 @@ services:
         - "traefik.http.routers.svelte.rule=PathPrefix(`/app`)"
         - "traefik.http.services.svelte.loadbalancer.server.port=3000"
         - "traefik.http.services.svelte.loadbalancer.server.scheme=http"
-        - "traefik.http.routers.catchall.entrypoints=websecure"
-        - "traefik.http.routers.catchall.rule=PathPrefix(`/`)"
-        - "traefik.http.routers.catchall.priority=1"
-        - "traefik.http.routers.catchall.middlewares=redirect-to-app"
-        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^.*"
+        - "traefik.http.routers.svelte.priority=2"
+        - "traefik.http.routers.frontend-root.entrypoints=websecure"
+        - "traefik.http.routers.frontend-root.rule=Path(`/`)"
+        - "traefik.http.routers.frontend-root.middlewares=redirect-to-app"
+        - "traefik.http.routers.frontend-root.priority=1"
+        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
 
@@ -92,6 +93,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.unity.priority=3"
         - "traefik.http.routers.backend.entrypoints=websecure" 
         - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
         - "traefik.http.services.backend.loadbalancer.server.port=5000"
