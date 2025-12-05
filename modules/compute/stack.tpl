@@ -88,7 +88,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/play/health"]
       interval: 10s
       timeout: 3s
       retries: 3
