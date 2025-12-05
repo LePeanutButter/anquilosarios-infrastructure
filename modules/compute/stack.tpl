@@ -90,12 +90,6 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=production
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/play/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
     deploy:
       replicas: 2
       restart_policy:
