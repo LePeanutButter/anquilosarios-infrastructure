@@ -87,8 +87,11 @@ services:
     image: ${acr_name}.azurecr.io/unity-webgl:latest
     networks:
       - default
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/play/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/play/health"]
       interval: 10s
       timeout: 3s
       retries: 3
