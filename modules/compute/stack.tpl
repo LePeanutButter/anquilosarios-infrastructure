@@ -67,7 +67,7 @@ services:
         - "traefik.http.routers.frontend-root.rule=Path(`/`)"
         - "traefik.http.routers.frontend-root.middlewares=redirect-to-app"
         - "traefik.http.routers.frontend-root.priority=1"
-        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$"
+        - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^/$$"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=/app"
         - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
 
