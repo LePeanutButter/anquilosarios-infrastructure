@@ -37,10 +37,6 @@ services:
       labels:
         - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
         - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
-        - "traefik.http.routers.http-catchall.entrypoints=web"
-        - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-        - "traefik.http.routers.http-catchall.middlewares=https-redirect"
-        - "traefik.http.routers.http-catchall.priority=1"
 
   svelte_frontend:
     image: ${acr_name}.azurecr.io/svelte-frontend:latest
